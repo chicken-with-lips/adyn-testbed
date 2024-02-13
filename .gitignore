@@ -360,3 +360,4 @@ MigrationBackup/
 FodyWeavers.xsd
 
 .idea
+*.sln.DotSettings.user
