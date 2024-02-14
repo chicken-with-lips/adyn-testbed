@@ -72,7 +72,7 @@ public class BilliardsExample : ADynExample
 
         var table = Simulation.CreateRigidBody(tableDef);
         World.Add<ColorComponent>(table, new ColorComponent() {
-            Color = Color.DARKGRAY,
+            Color = Color.DarkGray,
         });
 
         var railPosition = new AVector3(

@@ -1,12 +1,10 @@
-﻿using System.Numerics;
-using Client.Examples;
+﻿using Client.Examples;
 using Raylib_cs;
-using Silk.NET.Maths;
 
 public static class Program
 {
     [STAThread]
-    public static unsafe void Main()
+    public static void Main()
     {
         // initialize job scheduler singleton
         new JobScheduler.JobScheduler("ADyn", 0);
@@ -17,21 +15,22 @@ public static class Program
         //     MaxExpectedConcurrentJobs = 12,
         // });
 
+        Raylib.SetConfigFlags(ConfigFlags.ResizableWindow);
         Raylib.InitWindow(1280, 1024, "ADyn Test Bed");
         Raylib.SetTargetFPS(60);
         // Raylib.DisableCursor();
 
-        // var example = new BoxesExample();
+        var example = new BoxesExample();
         // var example = new CapsulesExample();
         // var example = new CylindersExample();
         // var example = new BilliardsExample();
-        var example = new EverythingExample();
+        // var example = new EverythingExample();
         example.Init();
 
-        while (!Raylib.WindowShouldClose()) {
-            // Raylib.PollInputEvents();
+        var camera = new Camera2D();
 
-            // Raylib.UpdateCamera(ref example.Camera, CameraMode.CAMERA_FREE);
+        while (!Raylib.WindowShouldClose()) {
+            // Raylib.UpdateCamera(ref example.Camera, CameraMode.Free);
 
             Raylib.BeginDrawing();
             {
@@ -42,6 +41,8 @@ public static class Program
                     example.Update();
                 }
                 Raylib.EndMode3D();
+
+                example.UpdateGui();
             }
             Raylib.EndDrawing();
         }

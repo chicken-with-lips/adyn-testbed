@@ -3,7 +3,9 @@ using ADyn;
 using ADyn.Components;
 using Arch.Core;
 using Client.Systems;
+using ImGuiNET;
 using Raylib_cs;
+using rlImGui_cs;
 
 namespace Client;
 
@@ -22,9 +24,14 @@ public abstract class ADynExample
     #region Members
 
     private Camera3D _camera = new();
-    private QueryDescription _queryDescription = new();
+    private string _footerText;
+    private int _fixedDeltaTimeMs;
 
     private readonly DrawShapesSystem _drawShapesSystem;
+    private int _velocityIterationCount;
+    private int _positionIterationCount;
+    private AScalar _guiGravity;
+    private float _gravity;
 
     #endregion
 
@@ -35,6 +42,8 @@ public abstract class ADynExample
 
         World = World.Create();
 
+        _footerText = "Press 'P' to pause and 'L' to step simulation while paused.";
+
         Simulation = new Simulation(World, SimulationConfiguration.Default with {
             ExecutionMode = SimulationExecutionMode.Sequential,
         });
@@ -44,9 +53,9 @@ public abstract class ADynExample
 
     public virtual void Init()
     {
-        // imguiCreate();
+        rlImGui.Setup();
 
-        _camera.Projection = CameraProjection.CAMERA_PERSPECTIVE;
+        _camera.Projection = CameraProjection.Perspective;
         _camera.FovY = 60f;
         _camera.Up = Vector3.UnitY;
         _camera.Position = new Vector3(0, 2, -10.0f);
@@ -62,21 +71,11 @@ public abstract class ADynExample
 //         auto config = edyn::init_config{};
 //         config.execution_mode = edyn::execution_mode::asynchronous;
 //         edyn::attach(*m_registry, config);
-//
-//         m_fixed_dt_ms = static_cast<int>(edyn::get_fixed_dt(*m_registry) * 1000);
-//         m_num_velocity_iterations = edyn::get_solver_velocity_iterations(*m_registry);
-//         m_num_position_iterations = edyn::get_solver_position_iterations(*m_registry);
-//         m_gui_gravity = m_gravity = -edyn::get_gravity(*m_registry).y;
-//
-//         // Input bindings
-//         m_bindings = (InputBinding*)BX_ALLOC(entry::getAllocator(), sizeof(InputBinding)*3);
-//         m_bindings[0].set(entry::Key::KeyP, entry::Modifier::None, 1, cmdTogglePause,  this);
-//         m_bindings[1].set(entry::Key::KeyL, entry::Modifier::None, 1, cmdStepSimulation, this);
-//         m_bindings[2].end();
-//
-//         inputAddBindings("base", m_bindings);
-//
-//         m_footer_text = m_default_footer_text;
+
+        _fixedDeltaTimeMs = (int)(Simulation.FixedDeltaTime * 1000);
+        _velocityIterationCount = (int)Simulation.SolverVelocityIterationCount;
+        _positionIterationCount = (int)Simulation.SolverPositionIterationCount;
+        _guiGravity = _gravity = -Simulation.Gravity.Y;
 
         CreateScene();
     }
@@ -88,10 +87,9 @@ public abstract class ADynExample
         // Cleanup.
         Console.WriteLine("TODO: ddShutdown();");
 
-        Console.WriteLine("TODO: imguiDestroy();");
+        rlImGui.Shutdown();
 
         Console.WriteLine("TODO: inputRemoveBindings(\"base\");");
-        Console.WriteLine("TODO: BX_FREE(entry::getAllocator(), m_bindings);");
     }
 
     protected virtual void UpdatePhysics()
@@ -101,36 +99,20 @@ public abstract class ADynExample
 
     public virtual bool Update()
     {
-//     int64_t now = bx::getHPCounter();
-//     const int64_t frameTime = now - m_timestamp;
-//     m_timestamp = now;
-//     const double freq = double(bx::getHPFrequency());
-//     const float deltaTime = float(frameTime/freq);
-//
         var deltaTime = Raylib.GetFrameTime();
 
+        if (Raylib.IsKeyReleased(KeyboardKey.P)) {
+            Simulation.IsPaused = !Simulation.IsPaused;
+        }
 
-//
-//     // Set view and projection matrix for view 0.
-//     float viewMtx[16];
-//     cameraGetViewMtx(viewMtx);
-//
-//     float proj[16];
-//     bx::mtxProj(proj, 60.0f, float(m_width)/float(m_height), 0.1f, 10000.0f, bgfx::getCaps()->homogeneousDepth);
-//
-//     bgfx::setViewTransform(0, viewMtx, proj);
-//     bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height) );
-//
-// #ifdef EDYN_SOUND_ENABLED
-//     auto camPos = cameraGetPosition();
-//     m_soloud.set3dListenerPosition(camPos.x, camPos.y, camPos.z);
-//     m_soloud.update3dAudio();
-// #endif
-//
-//     updateGUI();
-//
-//     updateSettings();
-//
+        if (Raylib.IsKeyReleased(KeyboardKey.L)) {
+            if (Simulation.IsPaused) {
+                Simulation.StepSimulation();
+            }
+        }
+
+        UpdateSettings();
+
 //     updatePicking(viewMtx, proj);
 //
         UpdatePhysics();
@@ -268,6 +250,69 @@ public abstract class ADynExample
 
     protected virtual void DestroyScene()
     {
+    }
+
+    public void UpdateGui()
+    {
+        rlImGui.Begin();
+
+        ShowSettings();
+        ShowFooter();
+
+        rlImGui.End();
+    }
+
+    private void UpdateSettings()
+    {
+        var fixedTimeDeltaMs = (int)(Simulation.FixedDeltaTime * 1000);
+
+        if (fixedTimeDeltaMs != _fixedDeltaTimeMs) {
+            Simulation.FixedDeltaTime = _fixedDeltaTimeMs * AScalar.CreateChecked(0.001);
+        }
+
+        if (Simulation.SolverVelocityIterationCount != _velocityIterationCount) {
+            Simulation.SolverVelocityIterationCount = (uint)_velocityIterationCount;
+        }
+
+        if (Simulation.SolverPositionIterationCount != _positionIterationCount) {
+            Simulation.SolverPositionIterationCount = (uint)_positionIterationCount;
+        }
+
+        if (Math.Abs(_guiGravity - _gravity) > AScalar.Epsilon) {
+            _gravity = _guiGravity;
+            Simulation.Gravity = new AVector3(0, -_gravity, 0);
+        }
+    }
+
+    private void ShowSettings()
+    {
+        ImGui.SetNextWindowPos(
+            new Vector2(Raylib.GetScreenWidth() - Raylib.GetScreenWidth() / 4.0f - 10.0f, 10.0f),
+            ImGuiCond.FirstUseEver
+        );
+        ImGui.SetNextWindowSize(
+            new Vector2(Raylib.GetScreenWidth() / 4.0f, Raylib.GetScreenHeight() / 3.5f),
+            ImGuiCond.FirstUseEver
+        );
+        ImGui.Begin("Settings");
+
+        ImGui.SliderInt("Time Step (ms)", ref _fixedDeltaTimeMs, 1, 50);
+        ImGui.SliderInt("Velocity Iterations", ref _velocityIterationCount, 1, 100);
+        ImGui.SliderInt("Position Iterations", ref _positionIterationCount, 0, 100);
+        ImGui.SliderFloat("Gravity (m/s^2)", ref _guiGravity, 0, 50, "%.2f");
+
+        ImGui.End();
+    }
+
+    private void ShowFooter()
+    {
+        ImGui.SetNextWindowPos(new Vector2(10, Raylib.GetScreenHeight() - 40f));
+        ImGui.SetNextWindowSize(new Vector2(Raylib.GetScreenWidth() - 20, 20));
+        ImGui.SetNextWindowBgAlpha(0.4f);
+
+        ImGui.Begin("Footer", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoMouseInputs);
+        ImGui.Text(_footerText);
+        ImGui.End();
     }
 
     private void OnCreateIsland(in Entity entity, ref IslandTag tag)

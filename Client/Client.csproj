@@ -8,15 +8,16 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+      <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+      <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Raylib-cs" Version="5.0.0" />
+      <PackageReference Include="Raylib-cs" Version="6.0.0" />
+      <PackageReference Include="rlImgui-cs" Version="2.0.2" />
       <PackageReference Include="Silk.NET.Windowing" Version="2.18.0" />
       <PackageReference Include="ZeroAllocJobScheduler" Version="1.0.1" />
     </ItemGroup>

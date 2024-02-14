@@ -143,7 +143,7 @@ public partial class DrawShapesSystem : BaseSystem<World, float>
         );
     }
 
-    private unsafe void DrawShape<TBoxShape>(in Entity entity, in TBoxShape shape, in Position position, in Orientation orientation, DrawCallback<TBoxShape> callback)
+    private void DrawShape<TBoxShape>(in Entity entity, in TBoxShape shape, in Position position, in Orientation orientation, DrawCallback<TBoxShape> callback)
         where TBoxShape : struct, IShape
     {
         var color = new Color(255, 255, 255, 255);
