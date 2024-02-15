@@ -20,10 +20,11 @@ public static class Program
         Raylib.SetTargetFPS(60);
         // Raylib.DisableCursor();
 
-        var example = new BoxesExample();
+        // var example = new BoxesExample();
         // var example = new CapsulesExample();
         // var example = new CylindersExample();
         // var example = new BilliardsExample();
+        var example = new CenterOfMassExample();
         // var example = new EverythingExample();
         example.Init();
 

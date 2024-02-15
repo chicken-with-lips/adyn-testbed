@@ -1,9 +1,7 @@
 using System.Numerics;
 using ADyn;
-using ADyn.Math;
 using ADyn.Shapes;
 using Raylib_cs;
-using Silk.NET.Maths;
 using Material = ADyn.Components.Material;
 
 namespace Client.Examples;

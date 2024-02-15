@@ -2,7 +2,6 @@ using ADyn;
 using ADyn.Components;
 using ADyn.Math;
 using ADyn.Shapes;
-using Silk.NET.Maths;
 
 namespace Client.Examples;
 

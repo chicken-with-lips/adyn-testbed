@@ -24,7 +24,7 @@ public partial class DrawShapesSystem : BaseSystem<World, float>
 
     [Query]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void DrawPlane(in Entity entity, in PlaneShape shape)
+    public void DrawPlane(Entity entity, in PlaneShape shape)
     {
         DrawShape(
             entity,
@@ -40,7 +40,7 @@ public partial class DrawShapesSystem : BaseSystem<World, float>
 
     [Query]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void DrawBox(in Entity entity, in Position position, in Orientation orientation, in BoxShape shape)
+    public void DrawBox(Entity entity, in Position position, in Orientation orientation, in BoxShape shape)
     {
         DrawShape(
             entity,
@@ -64,7 +64,7 @@ public partial class DrawShapesSystem : BaseSystem<World, float>
 
     [Query]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void DrawCapsule(in Entity entity, in Position position, in Orientation orientation, in CapsuleShape shape)
+    public void DrawCapsule(Entity entity, in Position position, in Orientation orientation, in CapsuleShape shape)
     {
         DrawShape(
             entity,
@@ -93,7 +93,7 @@ public partial class DrawShapesSystem : BaseSystem<World, float>
 
     [Query]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void DrawCylinder(in Entity entity, in Position position, in Orientation orientation, in CylinderShape shape)
+    public void DrawCylinder(Entity entity, in Position position, in Orientation orientation, in CylinderShape shape)
     {
         DrawShape(
             entity,
@@ -120,7 +120,7 @@ public partial class DrawShapesSystem : BaseSystem<World, float>
 
     [Query]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void DrawSphere(in Entity entity, in Position position, in Orientation orientation, in SphereShape shape)
+    public void DrawSphere(Entity entity, in Position position, in Orientation orientation, in SphereShape shape)
     {
         DrawShape(
             entity,
@@ -143,7 +143,7 @@ public partial class DrawShapesSystem : BaseSystem<World, float>
         );
     }
 
-    private void DrawShape<TBoxShape>(in Entity entity, in TBoxShape shape, in Position position, in Orientation orientation, DrawCallback<TBoxShape> callback)
+    private void DrawShape<TBoxShape>(Entity entity, in TBoxShape shape, in Position position, in Orientation orientation, DrawCallback<TBoxShape> callback)
         where TBoxShape : struct, IShape
     {
         var color = new Color(255, 255, 255, 255);

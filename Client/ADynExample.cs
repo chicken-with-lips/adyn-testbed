@@ -315,7 +315,7 @@ public abstract class ADynExample
         ImGui.End();
     }
 
-    private void OnCreateIsland(in Entity entity, ref IslandTag tag)
+    private void OnCreateIsland(Entity entity, ref IslandTag tag)
     {
         var color = System.Drawing.Color.FromArgb((int)(0xff000000 | (0x00ffffff & new Random().NextInt64())));
 
