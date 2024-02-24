@@ -22,9 +22,9 @@ public static class Program
 
         // var example = new BoxesExample();
         // var example = new CapsulesExample();
-        // var example = new CylindersExample();
+        var example = new CylindersExample();
         // var example = new BilliardsExample();
-        var example = new CenterOfMassExample();
+        // var example = new CenterOfMassExample();
         // var example = new EverythingExample();
         example.Init();
 

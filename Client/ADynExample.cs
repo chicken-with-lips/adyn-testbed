@@ -256,8 +256,28 @@ public abstract class ADynExample
     {
         rlImGui.Begin();
 
+        // ImGui.SetNextWindowPos(
+            // new Vector2(Raylib.GetScreenWidth() - Raylib.GetScreenWidth() / 3.0f - 10.0f, 10.0f),
+            // ImGuiCond.FirstUseEver
+        // );
+        ImGui.SetNextWindowSize(
+            new Vector2(200, 400),
+            ImGuiCond.FirstUseEver
+        );
+        
+        ImGui.Begin("Example");
+
+        ImGui.SliderInt("Time Step (ms)", ref _fixedDeltaTimeMs, 1, 50);
+        ImGui.SliderInt("Velocity Iterations", ref _velocityIterationCount, 1, 100);
+        ImGui.SliderInt("Position Iterations", ref _positionIterationCount, 0, 100);
+        ImGui.SliderFloat("Gravity (m/s^2)", ref _guiGravity, 0, 50, "%.2f");
+
+        ImGui.End();
+        
         ShowSettings();
         ShowFooter();
+
+
 
         rlImGui.End();
     }
@@ -287,13 +307,14 @@ public abstract class ADynExample
     private void ShowSettings()
     {
         ImGui.SetNextWindowPos(
-            new Vector2(Raylib.GetScreenWidth() - Raylib.GetScreenWidth() / 4.0f - 10.0f, 10.0f),
+            new Vector2(Raylib.GetScreenWidth() - Raylib.GetScreenWidth() / 3.0f - 10.0f, 10.0f),
             ImGuiCond.FirstUseEver
         );
         ImGui.SetNextWindowSize(
-            new Vector2(Raylib.GetScreenWidth() / 4.0f, Raylib.GetScreenHeight() / 3.5f),
+            new Vector2(Raylib.GetScreenWidth() / 3.0f, Raylib.GetScreenHeight() / 3.5f),
             ImGuiCond.FirstUseEver
         );
+
         ImGui.Begin("Settings");
 
         ImGui.SliderInt("Time Step (ms)", ref _fixedDeltaTimeMs, 1, 50);
@@ -315,7 +336,7 @@ public abstract class ADynExample
         ImGui.End();
     }
 
-    private void OnCreateIsland(Entity entity, ref IslandTag tag)
+    private void OnCreateIsland(in Entity entity, ref IslandTag tag)
     {
         var color = System.Drawing.Color.FromArgb((int)(0xff000000 | (0x00ffffff & new Random().NextInt64())));
 
